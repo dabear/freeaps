@@ -10,4 +10,7 @@
    <FileRef
       location = "group:Dependecies/rileylink_ios/RileyLink.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Dependecies/LibreTransmitter/LibreTransmitter.xcodeproj">
+   </FileRef>
 </Workspace>

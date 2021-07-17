@@ -1,26 +1,21 @@
-//
-//  HK.swift
-//  FreeAPS
-//
-//  Created by Bjørn Inge Berg on 16/07/2021.
-//
-
 import Foundation
+import HealthKit
+
 extension HKUnit {
     static let milligramsPerDeciliter: HKUnit = {
-        return HKUnit.gramUnit(with: .milli).unitDivided(by: .literUnit(with: .deci))
+        HKUnit.gramUnit(with: .milli).unitDivided(by: .literUnit(with: .deci))
     }()
 
     static let millimolesPerLiter: HKUnit = {
-        return HKUnit.moleUnit(with: .milli, molarMass: HKUnitMolarMassBloodGlucose).unitDivided(by: .liter())
+        HKUnit.moleUnit(with: .milli, molarMass: HKUnitMolarMassBloodGlucose).unitDivided(by: .liter())
     }()
 
     static let internationalUnitsPerHour: HKUnit = {
-        return HKUnit.internationalUnit().unitDivided(by: .hour())
+        HKUnit.internationalUnit().unitDivided(by: .hour())
     }()
 
     static let gramsPerUnit: HKUnit = {
-        return HKUnit.gram().unitDivided(by: .internationalUnit())
+        HKUnit.gram().unitDivided(by: .internationalUnit())
     }()
 
     var foundationUnit: Unit? {

@@ -1,5 +1,7 @@
 import Combine
 import Foundation
+import LibreTransmitter
+import LibreTransmitterUI
 import LoopKit
 import LoopKitUI
 import MinimedKit
@@ -11,11 +13,14 @@ import UserNotifications
 
 protocol DeviceDataManager {
     var pumpManager: PumpManagerUI? { get set }
+    var cgmManager: CGMManagerUI? { get set }
     var pumpDisplayState: CurrentValueSubject<PumpDisplayState?, Never> { get }
+    var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
     var recommendsLoop: PassthroughSubject<Void, Never> { get }
     var bolusTrigger: PassthroughSubject<Bool, Never> { get }
     var errorSubject: PassthroughSubject<Error, Never> { get }
     var pumpName: CurrentValueSubject<String, Never> { get }
+    var cgmName: CurrentValueSubject<String, Never> { get }
     var pumpExpiresAtDate: CurrentValueSubject<Date?, Never> { get }
     func heartbeat(date: Date, force: Bool)
     func createBolusProgressReporter() -> DoseProgressReporter?
@@ -27,13 +32,46 @@ private let staticPumpManagers: [PumpManagerUI.Type] = [
     MockPumpManager.self
 ]
 
+private let staticCGMManagers: [CGMManagerUI.Type] = [
+    LibreTransmitterManager.self
+]
+
 private let staticPumpManagersByIdentifier: [String: PumpManagerUI.Type] = staticPumpManagers.reduce(into: [:]) { map, Type in
+    map[Type.managerIdentifier] = Type
+}
+
+private let staticCGMManagersByIdentifier: [String: CGMManagerUI.Type] = staticCGMManagers.reduce(into: [:]) { map, Type in
     map[Type.managerIdentifier] = Type
 }
 
 private let accessLock = NSRecursiveLock(label: "BaseDeviceDataManager.accessLock")
 
-final class BaseDeviceDataManager: DeviceDataManager, Injectable {
+final class BaseDeviceDataManager: DeviceDataManager, Injectable, CGMManagerDelegate {
+    func startDateToFilterNewData(for _: CGMManager) -> Date? {
+        Date().addingTimeInterval(TimeInterval(-5.0 * 60.0))
+    }
+
+    func cgmManagerWantsDeletion(_: CGMManager) {
+        cgmManager = nil
+    }
+
+    func cgmManagerDidUpdateState(_: CGMManager) {
+        print("manager did update state")
+    }
+
+    func credentialStoragePrefix(for _: CGMManager) -> String {
+        print("credentialStoragePrefix called")
+        return "no.bjorninge.libre"
+    }
+
+    func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
+        print("cgmManager received new value: \(readingResult)")
+    }
+
+    func cgmManager(_: CGMManager, didUpdate status: CGMManagerStatus) {
+        print("cgmManager received new status: \(status)")
+    }
+
     private let processQueue = DispatchQueue.markedQueue(label: "BaseDeviceDataManager.processQueue")
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
     @Injected() private var storage: FileStorage!
@@ -48,6 +86,21 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     let bolusTrigger = PassthroughSubject<Bool, Never>()
     let errorSubject = PassthroughSubject<Error, Never>()
     let pumpNewStatus = PassthroughSubject<Void, Never>()
+
+    var cgmManager: CGMManagerUI? {
+        didSet {
+            cgmManager?.cgmManagerDelegate = self
+            cgmManager?.delegateQueue = processQueue
+            UserDefaults.standard.cgmManagerRawValue = cgmManager?.rawValue
+            if let cgmManager = cgmManager {
+                cgmDisplayState.value = CGMDisplayState(name: cgmManager.localizedTitle, image: cgmManager.smallImage)
+                cgmName.send(cgmManager.localizedTitle)
+
+            } else {
+                cgmDisplayState.value = nil
+            }
+        }
+    }
 
     var pumpManager: PumpManagerUI? {
         didSet {
@@ -75,14 +128,23 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
         (pumpManager as? MockPumpManager) == nil
     }
 
+    let cgmDisplayState = CurrentValueSubject<CGMDisplayState?, Never>(nil)
     let pumpDisplayState = CurrentValueSubject<PumpDisplayState?, Never>(nil)
     let pumpExpiresAtDate = CurrentValueSubject<Date?, Never>(nil)
     let pumpName = CurrentValueSubject<String, Never>("Pump")
+    let cgmName = CurrentValueSubject<String, Never>("CGM")
 
     init(resolver: Resolver) {
         injectServices(resolver)
         setupPumpManager()
+        setupCGMManager()
         UIDevice.current.isBatteryMonitoringEnabled = true
+    }
+
+    func setupCGMManager() {
+        if let cgmManagerRawValue = UserDefaults.standard.cgmManagerRawValue {
+            cgmManager = cgmManagerFromRawValue(cgmManagerRawValue)
+        }
     }
 
     func setupPumpManager() {
@@ -153,6 +215,24 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
         }
 
         return staticPumpManagersByIdentifier[managerIdentifier]
+    }
+
+    private func cgmManagerFromRawValue(_ rawValue: [String: Any]) -> CGMManagerUI? {
+        guard let rawState = rawValue["state"] as? CGMManager.RawStateValue,
+              let Manager = cgmManagerTypeFromRawValue(rawValue)
+        else {
+            return nil
+        }
+
+        return Manager.init(rawState: rawState) as? CGMManagerUI
+    }
+
+    private func cgmManagerTypeFromRawValue(_ rawValue: [String: Any]) -> CGMManager.Type? {
+        guard let managerIdentifier = rawValue["managerIdentifier"] as? String else {
+            return nil
+        }
+
+        return staticCGMManagersByIdentifier[managerIdentifier]
     }
 }
 

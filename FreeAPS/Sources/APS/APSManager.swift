@@ -12,6 +12,11 @@ protocol APSManager {
     var pumpManager: PumpManagerUI? { get set }
     var pumpDisplayState: CurrentValueSubject<PumpDisplayState?, Never> { get }
     var pumpName: CurrentValueSubject<String, Never> { get }
+
+    var cgmManager: CGMManagerUI? { get set }
+    var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
+    var cgmName: CurrentValueSubject<String, Never> { get }
+
     var isLooping: CurrentValueSubject<Bool, Never> { get }
     var lastLoopDate: Date { get }
     var lastLoopDateSubject: PassthroughSubject<Date, Never> { get }
@@ -51,6 +56,8 @@ enum APSError: LocalizedError {
 }
 
 final class BaseAPSManager: APSManager, Injectable {
+    // @Injected() private var cgmManager: CGMManagerUI?
+
     private let processQueue = DispatchQueue(label: "BaseAPSManager.processQueue")
     @Injected() private var storage: FileStorage!
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
@@ -78,6 +85,11 @@ final class BaseAPSManager: APSManager, Injectable {
         set { deviceDataManager.pumpManager = newValue }
     }
 
+    var cgmManager: CGMManagerUI? {
+        get { deviceDataManager.cgmManager }
+        set { deviceDataManager.cgmManager = newValue }
+    }
+
     let isLooping = CurrentValueSubject<Bool, Never>(false)
     let lastLoopDateSubject = PassthroughSubject<Date, Never>()
     let lastError = CurrentValueSubject<Error?, Never>(nil)
@@ -88,8 +100,16 @@ final class BaseAPSManager: APSManager, Injectable {
         deviceDataManager.pumpDisplayState
     }
 
+    var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> {
+        deviceDataManager.cgmDisplayState
+    }
+
     var pumpName: CurrentValueSubject<String, Never> {
         deviceDataManager.pumpName
+    }
+
+    var cgmName: CurrentValueSubject<String, Never> {
+        deviceDataManager.cgmName
     }
 
     var pumpExpiresAtDate: CurrentValueSubject<Date?, Never> {

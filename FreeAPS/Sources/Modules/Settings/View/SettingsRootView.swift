@@ -15,6 +15,10 @@ extension Settings {
                     Text("Pump").chevronCell().navigationLink(to: .pumpConfig, from: self)
                 }
 
+                Section(header: Text("CGM")) {
+                    Text("CGM").chevronCell().navigationLink(to: .cgmConfig, from: self)
+                }
+
                 Section(header: Text("Services")) {
                     Text("Nightscout").chevronCell().navigationLink(to: .nighscoutConfig, from: self)
                 }

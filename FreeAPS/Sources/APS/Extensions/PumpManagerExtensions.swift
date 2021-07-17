@@ -10,6 +10,15 @@ extension PumpManager {
     }
 }
 
+extension CGMManager {
+    var rawValue: [String: Any] {
+        [
+            "managerIdentifier": type(of: self).managerIdentifier,
+            "state": rawState
+        ]
+    }
+}
+
 extension PumpManagerUI {
     static func setupViewController() -> PumpManagerSetupViewController & UIViewController & CompletionNotifying {
         setupViewController(

@@ -6,6 +6,7 @@ import RileyLinkKit
 extension UserDefaults {
     private enum Key: String {
         case pumpManagerRawValue = "com.rileylink.PumpManagerRawValue"
+        case cgmManagerRawValue = "com.rileylink.CGMManagerRawValue"
         case rileyLinkConnectionManagerState = "com.rileylink.RileyLinkConnectionManagerState"
     }
 
@@ -15,6 +16,15 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.pumpManagerRawValue.rawValue)
+        }
+    }
+
+    var cgmManagerRawValue: CGMManager.RawStateValue? {
+        get {
+            dictionary(forKey: Key.cgmManagerRawValue.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.cgmManagerRawValue.rawValue)
         }
     }
 

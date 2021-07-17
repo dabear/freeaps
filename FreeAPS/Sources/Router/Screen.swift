@@ -12,6 +12,7 @@ enum Screen: Identifiable {
     case configEditor(file: String)
     case nighscoutConfig
     case pumpConfig
+    case cgmConfig
     case pumpSettingsEditor
     case basalProfileEditor
     case isfEditor
@@ -75,6 +76,8 @@ extension Screen {
             return AutotuneConfig.Builder(resolver: resolver).buildView()
         case .dataTable:
             return DataTable.Builder(resolver: resolver).buildView()
+        case .cgmConfig:
+            return CGMConfig.Builder(resolver: resolver).buildView()
         }
     }
 
