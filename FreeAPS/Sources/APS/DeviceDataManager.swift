@@ -16,6 +16,7 @@ protocol DeviceDataManager {
     var cgmManager: CGMManagerUI? { get set }
     var pumpDisplayState: CurrentValueSubject<PumpDisplayState?, Never> { get }
     var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
+    var pluginGlucose: PassthroughSubject<[BloodGlucose], Never> { get }
     var recommendsLoop: PassthroughSubject<Void, Never> { get }
     var bolusTrigger: PassthroughSubject<Bool, Never> { get }
     var errorSubject: PassthroughSubject<Error, Never> { get }
@@ -46,32 +47,7 @@ private let staticCGMManagersByIdentifier: [String: CGMManagerUI.Type] = staticC
 
 private let accessLock = NSRecursiveLock(label: "BaseDeviceDataManager.accessLock")
 
-final class BaseDeviceDataManager: DeviceDataManager, Injectable, CGMManagerDelegate {
-    func startDateToFilterNewData(for _: CGMManager) -> Date? {
-        Date().addingTimeInterval(TimeInterval(-5.0 * 60.0))
-    }
-
-    func cgmManagerWantsDeletion(_: CGMManager) {
-        cgmManager = nil
-    }
-
-    func cgmManagerDidUpdateState(_: CGMManager) {
-        print("manager did update state")
-    }
-
-    func credentialStoragePrefix(for _: CGMManager) -> String {
-        print("credentialStoragePrefix called")
-        return "no.bjorninge.libre"
-    }
-
-    func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
-        print("cgmManager received new value: \(readingResult)")
-    }
-
-    func cgmManager(_: CGMManager, didUpdate status: CGMManagerStatus) {
-        print("cgmManager received new status: \(status)")
-    }
-
+final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     private let processQueue = DispatchQueue.markedQueue(label: "BaseDeviceDataManager.processQueue")
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
     @Injected() private var storage: FileStorage!
@@ -86,6 +62,7 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable, CGMManagerDele
     let bolusTrigger = PassthroughSubject<Bool, Never>()
     let errorSubject = PassthroughSubject<Error, Never>()
     let pumpNewStatus = PassthroughSubject<Void, Never>()
+    let pluginGlucose = PassthroughSubject<[BloodGlucose], Never>()
 
     var cgmManager: CGMManagerUI? {
         didSet {
@@ -233,6 +210,59 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable, CGMManagerDele
         }
 
         return staticCGMManagersByIdentifier[managerIdentifier]
+    }
+}
+
+extension BaseDeviceDataManager: CGMManagerDelegate {
+    func startDateToFilterNewData(for _: CGMManager) -> Date? {
+        Date().addingTimeInterval(TimeInterval(-5.0 * 60.0))
+    }
+
+    func cgmManagerWantsDeletion(_: CGMManager) {
+        cgmManager = nil
+    }
+
+    func cgmManagerDidUpdateState(_: CGMManager) {
+        print("manager did update state")
+    }
+
+    func credentialStoragePrefix(for _: CGMManager) -> String {
+        print("credentialStoragePrefix called")
+        return "no.bjorninge.libre"
+    }
+
+    func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
+        print("cgmManager received new value: \(readingResult)")
+        guard case let .newData(glucoseSamples) = readingResult else {
+            print("No new glucose retrieved")
+            return
+        }
+
+        var result = [BloodGlucose]()
+        for sample in glucoseSamples {
+            let asMgdl = Int(sample.quantity.doubleValue(for: .milligramsPerDeciliter).rounded())
+
+            result.append(BloodGlucose(
+                _id: UUID().uuidString,
+                sgv: asMgdl,
+                // TODO: get this from cgmmanager somehow
+                // libretransmittermanager computes its own direction
+                // but it is not exposed as a part of loopkit protocols
+                // direction: BloodGlucose.Direction(rawValue: sample.),
+                direction: nil,
+
+                date: Decimal(Int(sample.date.timeIntervalSince1970 * 1000)),
+                dateString: sample.date,
+                filtered: nil,
+                noise: nil,
+                glucose: asMgdl
+            ))
+        }
+        pluginGlucose.send(result)
+    }
+
+    func cgmManager(_: CGMManager, didUpdate status: CGMManagerStatus) {
+        print("cgmManager received new status: \(status)")
     }
 }
 

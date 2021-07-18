@@ -19,6 +19,10 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
         subscribe()
     }
 
+    private func fetchFromCGMManager() -> AnyPublisher<[BloodGlucose], Never> {
+        apsManager.cgmGlucoseValue.eraseToAnyPublisher()
+    }
+
     private func subscribe() {
         timer.publisher
             .receive(on: processQueue)
@@ -28,11 +32,12 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
                 return Publishers.CombineLatest3(
                     Just(date),
                     Just(self.glucoseStorage.syncDate()),
-                    Publishers.CombineLatest(
+                    Publishers.CombineLatest3(
                         self.nightscoutManager.fetchGlucose(),
-                        self.fetchGlucoseFromSharedGroup()
+                        self.fetchGlucoseFromSharedGroup(),
+                        self.fetchFromCGMManager()
                     )
-                    .map { [$0, $1].flatMap { $0 } }
+                    .map { [$0, $1, $2].flatMap { $0 } }
                     .eraseToAnyPublisher()
                 )
                 .eraseToAnyPublisher()

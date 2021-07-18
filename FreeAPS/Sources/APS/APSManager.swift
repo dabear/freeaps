@@ -16,6 +16,7 @@ protocol APSManager {
     var cgmManager: CGMManagerUI? { get set }
     var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
     var cgmName: CurrentValueSubject<String, Never> { get }
+    var cgmGlucoseValue: PassthroughSubject<[BloodGlucose], Never> { get }
 
     var isLooping: CurrentValueSubject<Bool, Never> { get }
     var lastLoopDate: Date { get }
@@ -66,6 +67,7 @@ final class BaseAPSManager: APSManager, Injectable {
     @Injected() private var carbsStorage: CarbsStorage!
     @Injected() private var announcementsStorage: AnnouncementsStorage!
     @Injected() private var deviceDataManager: DeviceDataManager!
+
     @Injected() private var nightscout: NightscoutManager!
     @Injected() private var settingsManager: SettingsManager!
     @Injected() private var broadcaster: Broadcaster!
@@ -102,6 +104,10 @@ final class BaseAPSManager: APSManager, Injectable {
 
     var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> {
         deviceDataManager.cgmDisplayState
+    }
+
+    var cgmGlucoseValue: PassthroughSubject<[BloodGlucose], Never> {
+        deviceDataManager.pluginGlucose
     }
 
     var pumpName: CurrentValueSubject<String, Never> {
