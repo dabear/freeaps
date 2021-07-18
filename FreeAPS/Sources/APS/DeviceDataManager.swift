@@ -215,7 +215,7 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
 
 extension BaseDeviceDataManager: CGMManagerDelegate {
     func startDateToFilterNewData(for _: CGMManager) -> Date? {
-        Date().addingTimeInterval(TimeInterval(-5.0 * 60.0))
+        glucoseStorage.lastGlucoseDate()
     }
 
     func cgmManagerWantsDeletion(_: CGMManager) {
