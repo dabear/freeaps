@@ -231,6 +231,60 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
         return "no.bjorninge.libre"
     }
 
+    private func trendToDirection(_ trend: LoopKit.GlucoseTrend?) -> BloodGlucose.Direction {
+        guard let trend = trend else {
+            return .notComputable
+        }
+
+        /* TrendType:
+
+         case upUpUp       = 1
+         case upUp         = 2
+         case up           = 3
+         case flat         = 4
+         case down         = 5
+         case downDown     = 6
+         case downDownDown = 7
+
+         */
+        /*
+         Direction:
+         enum Direction: String, JSON {
+             case tripleUp = "TripleUp"
+             case doubleUp = "DoubleUp"
+             case singleUp = "SingleUp"
+             case fortyFiveUp = "FortyFiveUp"
+             case flat = "Flat"
+             case fortyFiveDown = "FortyFiveDown"
+             case singleDown = "SingleDown"
+             case doubleDown = "DoubleDown"
+             case tripleDown = "TripleDown"
+             case none = "NONE"
+             case notComputable = "NOT COMPUTABLE"
+             case rateOutOfRange = "RATE OUT OF RANGE"
+         }
+         **/
+
+        switch trend {
+        case .upUpUp:
+            return .tripleUp
+        case .upUp:
+            return .doubleUp
+        case .up:
+            return .singleUp
+        case .flat:
+            return .flat
+        case .down:
+            return .singleDown
+        case .downDown:
+            return .doubleDown
+        case .downDownDown:
+            return .tripleDown
+        @unknown default:
+            return .notComputable
+        }
+    }
+
     func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
         print("cgmManager received new value: \(readingResult)")
         guard case let .newData(glucoseSamples) = readingResult else {
@@ -238,19 +292,23 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
             return
         }
 
+        // There is no guarantee that glucoseSamples are in order,
+        // so we need to sort them to be able to add trend to the last one
+        let sortedSamples = glucoseSamples.sorted { first, second in
+            first.date.timeIntervalSince1970 > second.date.timeIntervalSince1970
+        }
+        let last = sortedSamples.last
+
         var result = [BloodGlucose]()
-        for sample in glucoseSamples {
+        for sample in sortedSamples {
             let asMgdl = Int(sample.quantity.doubleValue(for: .milligramsPerDeciliter).rounded())
 
             result.append(BloodGlucose(
                 _id: UUID().uuidString,
                 sgv: asMgdl,
-                // TODO: get this from cgmmanager somehow
-                // libretransmittermanager computes its own direction
-                // but it is not exposed as a part of loopkit protocols
-                // direction: BloodGlucose.Direction(rawValue: sample.),
-                direction: nil,
-
+                // TODO: get this from cgmmanager somehow for each reading
+                // rather than once for the last sample
+                direction: sample == last ? trendToDirection(cgmManager?.glucoseDisplay?.trendType) : nil,
                 date: Decimal(Int(sample.date.timeIntervalSince1970 * 1000)),
                 dateString: sample.date,
                 filtered: nil,
