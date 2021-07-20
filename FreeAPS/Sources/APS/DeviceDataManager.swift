@@ -292,12 +292,10 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
             return
         }
 
-        // There is no guarantee that glucoseSamples are in order,
+        // There is no guarantee that glucoseSamples are in cronological order,
         // so we need to sort them to be able to add trend to the last one
-        let sortedSamples = glucoseSamples.sorted { first, second in
-            first.date.timeIntervalSince1970 > second.date.timeIntervalSince1970
-        }
-        let last = sortedSamples.last
+        let sortedSamples = glucoseSamples.sorted { $0.date < $1.date }
+        let latest = sortedSamples.last
 
         var result = [BloodGlucose]()
         for sample in sortedSamples {
@@ -308,7 +306,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
                 sgv: asMgdl,
                 // TODO: get this from cgmmanager somehow for each reading
                 // rather than once for the last sample
-                direction: sample == last ? trendToDirection(cgmManager?.glucoseDisplay?.trendType) : nil,
+                direction: sample == latest ? trendToDirection(cgmManager?.glucoseDisplay?.trendType) : nil,
                 date: Decimal(Int(sample.date.timeIntervalSince1970 * 1000)),
                 dateString: sample.date,
                 filtered: nil,
