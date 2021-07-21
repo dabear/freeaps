@@ -223,7 +223,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
     }
 
     func cgmManagerDidUpdateState(_ cgmManager: CGMManager) {
-        print("manager did update state")
+        debug(.deviceManager, "cgmmanager did update state")
         UserDefaults.standard.cgmManagerRawValue = cgmManager.rawValue
         if self.cgmManager == nil, let newCGMManager = cgmManager as? CGMManagerUI {
             self.cgmManager = newCGMManager
@@ -232,7 +232,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
     }
 
     func credentialStoragePrefix(for _: CGMManager) -> String {
-        print("credentialStoragePrefix called")
+        debug(.deviceManager, "credentialStoragePrefix called")
         return "no.bjorninge.libre"
     }
 
@@ -291,9 +291,9 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
     }
 
     func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
-        print("cgmManager received new value: \(readingResult)")
+        debug(.deviceManager, "cgmManager received new value: \(readingResult)")
         guard case let .newData(glucoseSamples) = readingResult else {
-            print("No new glucose retrieved")
+            debug(.deviceManager, "No new glucose retrieved")
             return
         }
 
@@ -323,7 +323,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
     }
 
     func cgmManager(_: CGMManager, didUpdate status: CGMManagerStatus) {
-        print("cgmManager received new status: \(status)")
+        debug(.deviceManager, "cgmManager received new status: \(status)")
     }
 }
 
