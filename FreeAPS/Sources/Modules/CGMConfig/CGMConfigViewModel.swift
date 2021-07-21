@@ -10,6 +10,8 @@ extension CGMConfig {
         @Published var cgmState: CGMDisplayState?
         private(set) var initialSettings: CGMInitialSettings = .default
 
+        @Injected() var settingsManager: SettingsManager!
+
         override func subscribe() {
             provider.cgmDisplayState
                 .receive(on: DispatchQueue.main)

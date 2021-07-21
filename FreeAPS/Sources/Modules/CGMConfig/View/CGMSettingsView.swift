@@ -1,3 +1,4 @@
+import HealthKit
 import LoopKitUI
 import SwiftUI
 import UIKit
@@ -7,9 +8,11 @@ extension CGMConfig {
         let cgmManager: CGMManagerUI
         weak var completionDelegate: CompletionDelegate?
 
+        let glucoseUnit: HKUnit
+
         func makeUIViewController(context _: UIViewControllerRepresentableContext<CGMSettingsView>) -> UIViewController {
             var vc = cgmManager.settingsViewController(
-                for: .millimolesPerLiter,
+                for: glucoseUnit,
                 glucoseTintColor: Color.red,
                 guidanceColors: .init()
             )

@@ -25,7 +25,13 @@ extension CGMConfig {
             .navigationBarTitleDisplayMode(.automatic)
             .popover(isPresented: $viewModel.setupCGM) {
                 if let cgmManager = viewModel.provider.apsManager.cgmManager {
-                    CGMSettingsView(cgmManager: cgmManager, completionDelegate: viewModel)
+                    let apsGlucoseUnit = viewModel.provider.settingsManager.settings.units
+
+                    CGMSettingsView(
+                        cgmManager: cgmManager,
+                        completionDelegate: viewModel,
+                        glucoseUnit: apsGlucoseUnit == .mmolL ? .millimolesPerLiter : .milligramsPerDeciliter
+                    )
                 } else {
                     CGMSetupView(
                         cgmType: viewModel.setupCGMType,
