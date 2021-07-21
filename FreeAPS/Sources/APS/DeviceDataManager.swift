@@ -222,8 +222,13 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
         cgmManager = nil
     }
 
-    func cgmManagerDidUpdateState(_: CGMManager) {
+    func cgmManagerDidUpdateState(_ cgmManager: CGMManager) {
         print("manager did update state")
+        UserDefaults.standard.cgmManagerRawValue = cgmManager.rawValue
+        if self.cgmManager == nil, let newCGMManager = cgmManager as? CGMManagerUI {
+            self.cgmManager = newCGMManager
+        }
+        cgmName.send(cgmManager.localizedTitle)
     }
 
     func credentialStoragePrefix(for _: CGMManager) -> String {
