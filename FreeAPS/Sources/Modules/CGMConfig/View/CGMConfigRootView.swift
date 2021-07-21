@@ -17,7 +17,7 @@ extension CGMConfig {
                             }
                         }
                     } else {
-                        Button("Add Libre Transmitter") { viewModel.addCGM(.libre) }
+                        Button("Add Libre Transmitter") { viewModel.addCGM(.libretransmitter) }
                     }
                 }
             }
@@ -28,7 +28,7 @@ extension CGMConfig {
                     CGMSettingsView(cgmManager: cgmManager, completionDelegate: viewModel)
                 } else {
                     CGMSetupView(
-                        cgmType: viewModel.setupPumpType,
+                        cgmType: viewModel.setupCGMType,
                         cgmInitialSettings: viewModel.initialSettings,
                         completionDelegate: viewModel,
                         setupDelegate: viewModel

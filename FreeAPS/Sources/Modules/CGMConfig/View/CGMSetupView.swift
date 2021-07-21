@@ -15,17 +15,15 @@ extension CGMConfig {
         func makeUIViewController(context _: UIViewControllerRepresentableContext<CGMSetupView>) -> UIViewController {
             var setupViewController: CGMManagerSetupViewController & UIViewController & CompletionNotifying
 
-            /* switch cgmType {
-             case .minimed:
-                 setupViewController = MinimedPumpManager.setupViewController()
-             case .omnipod:
-                 setupViewController = OmnipodPumpManager.setupViewController()
-             case .simulator:
-                 setupViewController = MockPumpManager.setupViewController()
-             } */
+            switch cgmType {
+            case .libretransmitter:
+                setupViewController = LibreTransmitterManager.setupViewController(
+                    glucoseTintColor: .red,
+                    guidanceColors: .init()
+                )!
+            }
 
             // TODO: replace with libre
-            setupViewController = LibreTransmitterManager.setupViewController(glucoseTintColor: .red, guidanceColors: .init())!
 
             setupViewController.setupDelegate = setupDelegate
             setupViewController.completionDelegate = completionDelegate

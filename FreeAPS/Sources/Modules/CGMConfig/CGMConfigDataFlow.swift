@@ -6,8 +6,7 @@ enum CGMConfig {
     enum Config {}
 
     enum CGMType: Equatable {
-        case libre
-        case bar
+        case libretransmitter
     }
 
     struct CGMInitialSettings {

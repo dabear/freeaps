@@ -6,7 +6,7 @@ import SwiftUI
 extension CGMConfig {
     class ViewModel<Provider>: BaseViewModel<Provider>, ObservableObject where Provider: CGMConfigProvider {
         @Published var setupCGM = false
-        private(set) var setupPumpType: CGMType = .libre
+        private(set) var setupCGMType: CGMType = .libretransmitter
         @Published var cgmState: CGMDisplayState?
         private(set) var initialSettings: CGMInitialSettings = .default
 
@@ -21,7 +21,7 @@ extension CGMConfig {
 
         func addCGM(_ type: CGMType) {
             setupCGM = true
-            setupPumpType = type
+            setupCGMType = type
         }
     }
 }
