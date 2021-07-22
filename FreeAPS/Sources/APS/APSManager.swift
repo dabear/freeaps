@@ -57,8 +57,6 @@ enum APSError: LocalizedError {
 }
 
 final class BaseAPSManager: APSManager, Injectable {
-    // @Injected() private var cgmManager: CGMManagerUI?
-
     private let processQueue = DispatchQueue(label: "BaseAPSManager.processQueue")
     @Injected() private var storage: FileStorage!
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
@@ -71,6 +69,7 @@ final class BaseAPSManager: APSManager, Injectable {
     @Injected() private var nightscout: NightscoutManager!
     @Injected() private var settingsManager: SettingsManager!
     @Injected() private var broadcaster: Broadcaster!
+    @Injected() private var notificationManager: NotificationsManager!
     @Persisted(key: "lastAutotuneDate") private var lastAutotuneDate = Date()
     @Persisted(key: "lastLoopDate") var lastLoopDate: Date = .distantPast {
         didSet {

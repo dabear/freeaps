@@ -10,5 +10,6 @@ enum APSContainer: DependeciesContainer {
         container.register(FetchGlucoseManager.self) { _ in BaseFetchGlucoseManager(resolver: resolver) }
         container.register(FetchTreatmentsManager.self) { _ in BaseFetchTreatmentsManager(resolver: resolver) }
         container.register(FetchAnnouncementsManager.self) { _ in BaseFetchAnnouncementsManager(resolver: resolver) }
+        container.register(NotificationsManager.self) { _ in BaseNotificationsManager(resolver: resolver) }
     }
 }

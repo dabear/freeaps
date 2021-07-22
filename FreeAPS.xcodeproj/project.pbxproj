@@ -30,6 +30,7 @@
 		274261BF26A368C100B4062E /* LibreTransmitterUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 274261BD26A368C100B4062E /* LibreTransmitterUI.framework */; };
 		274261C026A3694800B4062E /* LibreTransmitter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 274261BC26A368C100B4062E /* LibreTransmitter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		274261C126A3694800B4062E /* LibreTransmitterUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 274261BD26A368C100B4062E /* LibreTransmitterUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		274261C326A9FB8900B4062E /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274261C226A9FB8900B4062E /* NotificationsManager.swift */; };
 		28089E07169488CF6DCC2A31 /* AddCarbsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86FC1CFD647CF34508AF9A3B /* AddCarbsRootView.swift */; };
 		2BE9A6FA20875F6F4F9CD461 /* PumpSettingsEditorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97F14812C1AFED3621165A5 /* PumpSettingsEditorProvider.swift */; };
 		3083261C4B268E353F36CD0B /* AutotuneConfigDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCCCCE633F5E98E41B0CD3C /* AutotuneConfigDataFlow.swift */; };
@@ -339,6 +340,7 @@
 		274261AA26A2207F00B4062E /* HKUnit+GlucoseUnits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKUnit+GlucoseUnits.swift"; sourceTree = "<group>"; };
 		274261BC26A368C100B4062E /* LibreTransmitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LibreTransmitter.framework; path = "../../Library/Developer/Xcode/DerivedData/FreeAPS-evaqnqrakmtlwbcrlfmzdriolvbl/Build/Products/Debug-iphoneos/LibreTransmitter.framework"; sourceTree = "<group>"; };
 		274261BD26A368C100B4062E /* LibreTransmitterUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LibreTransmitterUI.framework; path = "../../Library/Developer/Xcode/DerivedData/FreeAPS-evaqnqrakmtlwbcrlfmzdriolvbl/Build/Products/Debug-iphoneos/LibreTransmitterUI.framework"; sourceTree = "<group>"; };
+		274261C226A9FB8900B4062E /* NotificationsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		2AD22C985B79A2F0D2EA3D9D /* PumpConfigRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpConfigRootView.swift; sourceTree = "<group>"; };
 		2F2A13DF0EDEEEDC4106AA2A /* NightscoutConfigDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NightscoutConfigDataFlow.swift; sourceTree = "<group>"; };
 		3239D795F77DEB5676F9427A /* ISFEditorBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorBuilder.swift; sourceTree = "<group>"; };
@@ -1026,6 +1028,7 @@
 				38A43597262E0E4900E80935 /* FetchAnnouncementsManager.swift */,
 				38DAB289260D349500F74C1A /* FetchGlucoseManager.swift */,
 				38192E06261BA9960094D973 /* FetchTreatmentsManager.swift */,
+				274261C226A9FB8900B4062E /* NotificationsManager.swift */,
 				38A504F625DDA0E200C5B9E8 /* Extensions */,
 				388E5A5825B6F0070019842D /* OpenAPS */,
 				38A0362725ECF05300FCBB52 /* Storage */,
@@ -1764,6 +1767,7 @@
 				3811DE5C25C9D4D500A708ED /* Formatters.swift in Sources */,
 				3811DEC525C9D99900A708ED /* StorageContainer.swift in Sources */,
 				3871F39F25ED895A0013ECB5 /* Decimal+Extensions.swift in Sources */,
+				274261C326A9FB8900B4062E /* NotificationsManager.swift in Sources */,
 				3811DE7F25C9D6D300A708ED /* LoginBuilder.swift in Sources */,
 				3811DE3525C9D49500A708ED /* HomeRootView.swift in Sources */,
 				274261A326A2175E00B4062E /* CGMConfigViewModel.swift in Sources */,
