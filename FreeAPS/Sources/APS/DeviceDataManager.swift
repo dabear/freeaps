@@ -16,7 +16,7 @@ protocol DeviceDataManager {
     var cgmManager: CGMManagerUI? { get set }
     var pumpDisplayState: CurrentValueSubject<PumpDisplayState?, Never> { get }
     var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
-    var pluginGlucose: PassthroughSubject<[BloodGlucose], Never> { get }
+    var pluginGlucose: CurrentValueSubject<[BloodGlucose], Never> { get }
     var recommendsLoop: PassthroughSubject<Void, Never> { get }
     var bolusTrigger: PassthroughSubject<Bool, Never> { get }
     var errorSubject: PassthroughSubject<Error, Never> { get }
@@ -62,7 +62,7 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     let bolusTrigger = PassthroughSubject<Bool, Never>()
     let errorSubject = PassthroughSubject<Error, Never>()
     let pumpNewStatus = PassthroughSubject<Void, Never>()
-    let pluginGlucose = PassthroughSubject<[BloodGlucose], Never>()
+    let pluginGlucose = CurrentValueSubject<[BloodGlucose], Never>([])
 
     var cgmManager: CGMManagerUI? {
         didSet {

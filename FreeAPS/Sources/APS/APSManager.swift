@@ -16,7 +16,7 @@ protocol APSManager {
     var cgmManager: CGMManagerUI? { get set }
     var cgmDisplayState: CurrentValueSubject<CGMDisplayState?, Never> { get }
     var cgmName: CurrentValueSubject<String, Never> { get }
-    var cgmGlucoseValue: PassthroughSubject<[BloodGlucose], Never> { get }
+    var cgmGlucoseValue: CurrentValueSubject<[BloodGlucose], Never> { get }
 
     var isLooping: CurrentValueSubject<Bool, Never> { get }
     var lastLoopDate: Date { get }
@@ -105,7 +105,7 @@ final class BaseAPSManager: APSManager, Injectable {
         deviceDataManager.cgmDisplayState
     }
 
-    var cgmGlucoseValue: PassthroughSubject<[BloodGlucose], Never> {
+    var cgmGlucoseValue: CurrentValueSubject<[BloodGlucose], Never> {
         deviceDataManager.pluginGlucose
     }
 
