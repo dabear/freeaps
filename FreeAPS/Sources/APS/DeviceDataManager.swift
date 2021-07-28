@@ -236,9 +236,10 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
         return "no.bjorninge.libre"
     }
 
-    private func trendToDirection(_ trend: LoopKit.GlucoseTrend?) -> BloodGlucose.Direction {
+    private func trendToDirection(_ trend: LoopKit.GlucoseTrend?) -> BloodGlucose.Direction? {
         guard let trend = trend else {
-            return .notComputable
+            // return .notComputable
+            return nil
         }
 
         /* TrendType:
@@ -286,7 +287,8 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
         case .downDownDown:
             return .tripleDown
         @unknown default:
-            return .notComputable
+            // return .notComputable
+            return nil
         }
     }
 
