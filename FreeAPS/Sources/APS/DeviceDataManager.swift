@@ -215,7 +215,7 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
 
 extension BaseDeviceDataManager: CGMManagerDelegate {
     func startDateToFilterNewData(for _: CGMManager) -> Date? {
-        glucoseStorage.lastGlucoseDate()
+        glucoseStorage.syncDate()
     }
 
     func cgmManagerWantsDeletion(_: CGMManager) {
@@ -301,8 +301,8 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
 
         // There is no guarantee that glucoseSamples are in cronological order,
         // so we need to sort them to be able to add trend to the last one
-        let sortedSamples = glucoseSamples.sorted { $0.date < $1.date }
-        let latest = sortedSamples.last
+        let sortedSamples = glucoseSamples.sorted { $0.date > $1.date }
+        let latest = sortedSamples.first
 
         var result = [BloodGlucose]()
         for sample in sortedSamples {
