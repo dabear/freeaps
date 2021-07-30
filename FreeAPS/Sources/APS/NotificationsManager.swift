@@ -35,7 +35,7 @@ final class BaseNotificationsManager: NotificationsManager, Injectable {
     }
 
     func requestNotificationPermissions() {
-        //important! DONT USE debug() here. Doing so will create a race condition
+        // important! DONT USE debug() here. Doing so will create a race condition
 
         // debug(.apsManager, "freeaps requestNotificationPermissions called")
         print("freeaps requestNotificationPermissions called")

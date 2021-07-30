@@ -49,8 +49,6 @@ private let accessLock = NSRecursiveLock(label: "BaseDeviceDataManager.accessLoc
 
 final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     private let processQueue = DispatchQueue.markedQueue(label: "BaseDeviceDataManager.processQueue")
-    private let cgmQueue = DispatchQueue
-        .markedQueue(label: "BaseDeviceDataManager.cgmQueue", qos: .utility, attributes: .concurrent)
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
     @Injected() private var storage: FileStorage!
     @Injected() private var broadcaster: Broadcaster!
@@ -69,7 +67,7 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     var cgmManager: CGMManagerUI? {
         didSet {
             cgmManager?.cgmManagerDelegate = self
-            cgmManager?.delegateQueue = cgmQueue
+            cgmManager?.delegateQueue = processQueue
             UserDefaults.standard.cgmManagerRawValue = cgmManager?.rawValue
             if let cgmManager = cgmManager {
                 cgmDisplayState.value = CGMDisplayState(name: cgmManager.localizedTitle, image: cgmManager.smallImage)
