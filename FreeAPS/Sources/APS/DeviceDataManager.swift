@@ -49,7 +49,8 @@ private let accessLock = NSRecursiveLock(label: "BaseDeviceDataManager.accessLoc
 
 final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     private let processQueue = DispatchQueue.markedQueue(label: "BaseDeviceDataManager.processQueue")
-    private let cgmQueue = DispatchQueue.markedQueue(label: "BaseDeviceDataManager.cgmQueue")
+    private let cgmQueue = DispatchQueue
+        .markedQueue(label: "BaseDeviceDataManager.cgmQueue", qos: .utility, attributes: .concurrent)
     @Injected() private var pumpHistoryStorage: PumpHistoryStorage!
     @Injected() private var storage: FileStorage!
     @Injected() private var broadcaster: Broadcaster!
