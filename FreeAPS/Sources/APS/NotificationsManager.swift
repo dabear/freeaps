@@ -35,15 +35,17 @@ final class BaseNotificationsManager: NotificationsManager, Injectable {
     }
 
     func requestNotificationPermissions() {
-        debug(.apsManager, "freeaps requestNotificationPermissions called")
+        //important! DONT USE debug() here. Doing so will create a race condition
+
+        // debug(.apsManager, "freeaps requestNotificationPermissions called")
         print("freeaps requestNotificationPermissions called")
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.badge, .sound, .alert]) { granted, error in
             if granted {
-                debug(.apsManager, "freeaps requestNotificationPermissions was granted")
+                // debug(.apsManager, "freeaps requestNotificationPermissions was granted")
                 print("freeaps requestNotificationPermissions was granted")
             } else {
-                debug(.apsManager, "freeaps requestNotificationPermissions failed because of error: \(String(describing: error))")
+                // debug(.apsManager, "freeaps requestNotificationPermissions failed because of error: \(String(describing: error))")
                 print("freeaps requestNotificationPermissions failed because of error: \(String(describing: error))")
             }
         }
