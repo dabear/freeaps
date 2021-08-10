@@ -54,6 +54,8 @@ final class BaseDeviceDataManager: DeviceDataManager, Injectable {
     @Injected() private var broadcaster: Broadcaster!
     @Injected() private var glucoseStorage: GlucoseStorage!
 
+    @Injected() private var nightscout: NightscoutManager!
+
     @Persisted(key: "BaseDeviceDataManager.lastEventDate") var lastEventDate: Date? = nil
     @SyncAccess(lock: accessLock) @Persisted(key: "BaseDeviceDataManager.lastHeartBeatTime") var lastHeartBeatTime: Date =
         .distantPast
@@ -310,6 +312,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
 
             result.append(BloodGlucose(
                 _id: UUID().uuidString,
+                device: "Freeaps",
                 sgv: asMgdl,
                 // TODO: get this from cgmmanager somehow for each reading
                 // rather than once for the last sample
@@ -322,6 +325,9 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
             ))
         }
         pluginGlucose.send(result)
+        if cgmManager?.shouldSyncToRemoteService == true {
+            nightscout.uploadPrimarySourceGlucoseValues(result)
+        }
     }
 
     func cgmManager(_: CGMManager, didUpdate status: CGMManagerStatus) {

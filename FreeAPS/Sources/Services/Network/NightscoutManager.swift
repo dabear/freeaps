@@ -11,6 +11,7 @@ protocol NightscoutManager {
     func deleteCarbs(at date: Date)
     func uploadStatus()
     var cgmURL: URL? { get }
+    func uploadPrimarySourceGlucoseValues(_ glucose: [BloodGlucose])
 }
 
 final class BaseNightscoutManager: NightscoutManager, Injectable {
@@ -147,6 +148,25 @@ final class BaseNightscoutManager: NightscoutManager, Injectable {
                     debug(.nightscout, "Carbs deleted")
                 case let .failure(error):
                     debug(.nightscout, error.localizedDescription)
+                }
+            } receiveValue: {}
+            .store(in: &lifetime)
+    }
+
+    // we only upload glucose values if they come from a local cgm device
+    func uploadPrimarySourceGlucoseValues(_ glucose: [BloodGlucose]) {
+        guard let nightscout = nightscoutAPI, isUploadEnabled else {
+            debug(.nightscout, "Not uploading to nightscout")
+            return
+        }
+
+        nightscout.uploadEntries(glucose: glucose)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    debug(.nightscout, "glucose value upload successful")
+                case let .failure(error):
+                    debug(.nightscout, "glucose upload error: \(error.localizedDescription)")
                 }
             } receiveValue: {}
             .store(in: &lifetime)
