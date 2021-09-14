@@ -295,6 +295,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
     }
 
     func cgmManager(_: CGMManager, hasNew readingResult: CGMReadingResult) {
+        dispatchPrecondition(condition: .onQueue(processQueue))
         debug(.deviceManager, "cgmManager received new value: \(readingResult)")
         guard case let .newData(glucoseSamples) = readingResult else {
             debug(.deviceManager, "No new glucose retrieved")
@@ -324,9 +325,16 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
                 glucose: asMgdl
             ))
         }
-        pluginGlucose.send(result)
-        if cgmManager?.shouldSyncToRemoteService == true {
-            nightscout.uploadPrimarySourceGlucoseValues(result)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                debug(.deviceManager, "could not send glucose value")
+                return
+            }
+            self.pluginGlucose.send(result)
+            if self.cgmManager?.shouldSyncToRemoteService == true {
+                self.nightscout.uploadPrimarySourceGlucoseValues(result)
+            }
         }
     }
 
