@@ -23,6 +23,25 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
         apsManager.cgmGlucoseValue.eraseToAnyPublisher()
     }
 
+    var glucoseCombination:
+        Publishers.CombineLatest<
+            AnyPublisher<[BloodGlucose], Never>,
+            AnyPublisher<[BloodGlucose], Never>
+        > {
+            let hasDirectSource = (apsManager.cgmManager != nil)
+
+            // idea is that we need to avoid retrieving from nightscout
+            // while we are at the same time uploading values to nightscout
+            // this avoid entries being processed twice
+
+            return Publishers.CombineLatest(
+                hasDirectSource ? self.fetchFromCGMManager() : self.nightscoutManager.fetchGlucose(),
+                self.fetchGlucoseFromSharedGroup()
+            )
+        }
+
+    
+
     private func subscribe() {
         timer.publisher
             .receive(on: processQueue)
@@ -32,13 +51,9 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
                 return Publishers.CombineLatest3(
                     Just(date),
                     Just(self.glucoseStorage.syncDate()),
-                    Publishers.CombineLatest3(
-                        self.nightscoutManager.fetchGlucose(),
-                        self.fetchGlucoseFromSharedGroup(),
-                        self.fetchFromCGMManager()
-                    )
-                    .map { [$0, $1, $2].flatMap { $0 } }
-                    .eraseToAnyPublisher()
+                    self.glucoseCombination
+                        .map { [$0, $1].flatMap { $0 } }
+                        .eraseToAnyPublisher()
                 )
                 .eraseToAnyPublisher()
             }

@@ -331,6 +331,7 @@ extension BaseDeviceDataManager: CGMManagerDelegate {
                 debug(.deviceManager, "could not send glucose value")
                 return
             }
+            debug(.deviceManager, "pluginglucose, sending \(result.count) entries")
             self.pluginGlucose.send(result)
             if self.cgmManager?.shouldSyncToRemoteService == true {
                 self.nightscout.uploadPrimarySourceGlucoseValues(result)
