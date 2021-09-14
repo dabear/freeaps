@@ -17,11 +17,31 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
     init(resolver: Resolver) {
         injectServices(resolver)
         subscribe()
+        subscribeToCGMManager()
     }
 
-    private func fetchFromCGMManager() -> AnyPublisher<[BloodGlucose], Never> {
+    private var managerGlucose: [BloodGlucose]?
+    func subscribeToCGMManager() {
         apsManager.cgmGlucoseValue.eraseToAnyPublisher()
+            .sink { glucose in
+                self.managerGlucose = glucose
+            }
+            .store(in: &lifetime)
     }
+
+    // fetchFromCGMManagerOld did not ever complete, resulting in many "new glucose found"
+    // so we hack it by using a Just([]) publisher instead
+    private func fetchFromCGMManager() -> AnyPublisher<[BloodGlucose], Never> {
+        if let glucose = managerGlucose {
+            managerGlucose = []
+            return Just(glucose).eraseToAnyPublisher()
+        }
+        return Just([]).eraseToAnyPublisher()
+    }
+
+    /* private func fetchFromCGMManagerOld() -> AnyPublisher<[BloodGlucose], Never> {
+         apsManager.cgmGlucoseValue.eraseToAnyPublisher()
+     } */
 
     var glucoseCombination:
         Publishers.CombineLatest<
@@ -50,18 +70,18 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
                     Just(date),
                     Just(self.glucoseStorage.syncDate()),
                     self.glucoseCombination
-                        .map { [$0, $1].flatMap { $0 } }.share()
+                        .map { [$0, $1].flatMap { $0 } }
                         .eraseToAnyPublisher()
                 )
                 .eraseToAnyPublisher()
             }
-            .share()
+
             .sink { date, syncDate, glucose in
                 // Because of Spike dosn't respect a date query
                 let filteredByDate = glucose.filter { $0.dateString > syncDate }
                 let filtered = self.glucoseStorage.filterTooFrequentGlucose(filteredByDate, at: syncDate)
                 if !filtered.isEmpty {
-                    debug(.nightscout, "New glucose found")
+                    debug(.nightscout, "New glucose found:: \(String(describing: filtered))")
                     self.glucoseStorage.storeGlucose(filtered)
                     self.apsManager.heartbeat(date: date, force: false)
                 }
