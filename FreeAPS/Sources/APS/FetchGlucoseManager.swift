@@ -40,8 +40,6 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
             )
         }
 
-    
-
     private func subscribe() {
         timer.publisher
             .receive(on: processQueue)
@@ -52,11 +50,12 @@ final class BaseFetchGlucoseManager: FetchGlucoseManager, Injectable {
                     Just(date),
                     Just(self.glucoseStorage.syncDate()),
                     self.glucoseCombination
-                        .map { [$0, $1].flatMap { $0 } }
+                        .map { [$0, $1].flatMap { $0 } }.share()
                         .eraseToAnyPublisher()
                 )
                 .eraseToAnyPublisher()
             }
+            .share()
             .sink { date, syncDate, glucose in
                 // Because of Spike dosn't respect a date query
                 let filteredByDate = glucose.filter { $0.dateString > syncDate }
