@@ -32,8 +32,11 @@ struct PumpView: View {
                     if reservoir == 0xDEAD_BEEF {
                         Text("50+ U").font(.system(size: 12, weight: .bold))
                     } else {
-                        Text(reservoirFormatter.string(from: reservoir as NSNumber)! + " U")
-                            .font(.system(size: 12, weight: .bold))
+                        Text(
+                            reservoirFormatter
+                                .string(from: reservoir as NSNumber)! + NSLocalizedString(" U", comment: "Insulin unit")
+                        )
+                        .font(.system(size: 12, weight: .bold))
                     }
                 }
             }
@@ -74,7 +77,12 @@ struct PumpView: View {
         let minutes = Int(time / 1.minutes.timeInterval)
 
         if days >= 1 {
+<<<<<<< HEAD
             return "\(days)d \(hours)h"
+=======
+            return "\(days)" + NSLocalizedString("d", comment: "abbreviation for days") + " \(hours)" +
+                NSLocalizedString("h", comment: "abbreviation for hours")
+>>>>>>> 2c29d12 (iOS 15 broken menu fixed)
         }
 
         if hours >= 1 {
