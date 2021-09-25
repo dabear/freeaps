@@ -16,7 +16,7 @@ extension Settings {
                 }
 
                 Section(header: Text("CGM")) {
-                    Text("CGM").chevronCell().navigationLink(to: .cgmConfig, from: self)
+                    Text("CGM").navigationLink(to: .cgmConfig, from: self)
                 }
 
                 Section(header: Text("Services")) {
