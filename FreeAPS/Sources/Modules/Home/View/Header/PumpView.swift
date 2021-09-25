@@ -77,12 +77,8 @@ struct PumpView: View {
         let minutes = Int(time / 1.minutes.timeInterval)
 
         if days >= 1 {
-<<<<<<< HEAD
-            return "\(days)d \(hours)h"
-=======
             return "\(days)" + NSLocalizedString("d", comment: "abbreviation for days") + " \(hours)" +
                 NSLocalizedString("h", comment: "abbreviation for hours")
->>>>>>> 2c29d12 (iOS 15 broken menu fixed)
         }
 
         if hours >= 1 {
