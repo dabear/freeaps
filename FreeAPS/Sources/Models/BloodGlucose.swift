@@ -22,7 +22,7 @@ struct BloodGlucose: JSON, Identifiable, Hashable {
     }
 
     var device: String = ""
-    var tyoe: String = "sgv"
+    var type: String = "sgv"
     var sgv: Int?
     let direction: Direction?
     let date: Decimal
